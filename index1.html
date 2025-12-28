@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LibreOffice Writer Quiz - Class X IT</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f2f2f2;
+}
+.container {
+    width: 700px;
+    background: white;
+    margin: auto;
+    padding: 20px;
+    border-radius: 6px;
+}
+#timer {
+    text-align: right;
+    font-size: 20px;
+    color: red;
+}
+.option {
+    display: block;
+    margin: 6px 0;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+.incorrect {
+    color: red;
+    font-weight: bold;
+}
+button {
+    padding: 8px 16px;
+    margin: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>LibreOffice Writer Quiz – Class X IT</h2>
+<div id="timer"></div>
+<hr>
+
+<div id="quiz"></div>
+
+<button onclick="nextQuestion()">Next</button>
+<button onclick="skipQuestion()">Skip</button>
+
+<h3 id="result"></h3>
+</div>
+
+<script>
+// ---------------- QUESTIONS (30) ----------------
+let questions = [
+ {q:"LibreOffice Writer is used for?", o:["Spreadsheets","Word Processing","Presentations","Database"], a:1},
+ {q:"File extension for Writer documents?", o:[".ods",".odt",".odp",".odb"], a:1},
+ {q:"Default font in LibreOffice Writer?", o:["Arial","Liberation Serif","Times New Roman","Calibri"], a:1},
+ {q:"Shortcut to save a document?", o:["Ctrl+S","Ctrl+P","Ctrl+O","Ctrl+N"], a:0},
+ {q:"Shortcut to copy text?", o:["Ctrl+X","Ctrl+C","Ctrl+V","Ctrl+Z"], a:1},
+ {q:"Shortcut to paste text?", o:["Ctrl+X","Ctrl+C","Ctrl+V","Ctrl+Z"], a:2},
+ {q:"Shortcut to undo an action?", o:["Ctrl+Y","Ctrl+Z","Ctrl+U","Ctrl+T"], a:1},
+ {q:"Used to create numbered list?", o:["Bullets","Numbering","Table","Header"], a:1},
+ {q:"Used to create bullet points?", o:["Bullets","Numbering","Table","Hyperlink"], a:0},
+ {q:"Feature to check spelling?", o:["AutoCorrect","SpellCheck","Track Changes","Formatting"], a:1},
+ {q:"Shortcut to print document?", o:["Ctrl+P","Ctrl+S","Ctrl+O","Ctrl+N"], a:0},
+ {q:"Used to insert page number?", o:["Insert→Page Number","Format→Page","Tools→Number","Edit→Number"], a:0},
+ {q:"Default page orientation?", o:["Landscape","Portrait","Both","None"], a:1},
+ {q:"Used to create a table?", o:["Insert→Table","Format→Table","Tools→Table","Edit→Table"], a:0},
+ {q:"Used to insert image?", o:["Insert→Picture","Format→Picture","Tools→Picture","Edit→Picture"], a:0},
+ {q:"Feature to track changes?", o:["SpellCheck","AutoCorrect","Track Changes","Styles"], a:2},
+ {q:"Shortcut to select all?", o:["Ctrl+A","Ctrl+S","Ctrl+C","Ctrl+V"], a:0},
+ {q:"Used to set line spacing?", o:["Format→Paragraph","Tools→Paragraph","Insert→Paragraph","Edit→Paragraph"], a:0},
+ {q:"Used to set margins?", o:["Format→Page","Tools→Page","Insert→Page","Edit→Page"], a:0},
+ {q:"Used to insert header/footer?", o:["Insert→Header/Footer","Format→Header/Footer","Tools→Header/Footer","Edit→Header/Footer"], a:0},
+ {q:"Default page size?", o:["A3","A4","Letter","Legal"], a:1},
+ {q:"Shortcut to open document?", o:["Ctrl+O","Ctrl+N","Ctrl+S","Ctrl+P"], a:0},
+ {q:"Used to apply styles?", o:["Format→Styles","Insert→Styles","Tools→Styles","Edit→Styles"], a:0},
+ {q:"Used to add hyperlink?", o:["Insert→Hyperlink","Format→Hyperlink","Tools→Hyperlink","Edit→Hyperlink"], a:0},
+ {q:"Used to find text?", o:["Ctrl+F","Ctrl+H","Ctrl+G","Ctrl+E"], a:0},
+ {q:"Used to replace text?", o:["Ctrl+F","Ctrl+H","Ctrl+G","Ctrl+E"], a:1},
+ {q:"Shortcut for bold text?", o:["Ctrl+B","Ctrl+I","Ctrl+U","Ctrl+L"], a:0},
+ {q:"Shortcut for italic text?", o:["Ctrl+B","Ctrl+I","Ctrl+U","Ctrl+L"], a:1},
+ {q:"Shortcut for underline text?", o:["Ctrl+B","Ctrl+I","Ctrl+U","Ctrl+L"], a:2},
+ {q:"Used to insert special characters?", o:["Insert→Symbol","Format→Symbol","Tools→Symbol","Edit→Symbol"], a:0}
+];
+
+// Shuffle questions
+questions.sort(() => Math.random() - 0.5);
+
+let index = 0;
+let score = 0;
+let time = 30;
+let timer;
+let answered = false;
+
+function startTimer() {
+    time = 30;
+    clearInterval(timer);
+    timer = setInterval(() => {
+        document.getElementById("timer").innerHTML =
+            "Time Left: " + time + " sec";
+        time--;
+        if (time < 0) {
+            clearInterval(timer);
+            skipQuestion();
+        }
+    }, 1000);
+}
+
+function showQuestion() {
+    if (index >= questions.length) {
+        document.getElementById("quiz").innerHTML = "";
+        document.getElementById("result").innerHTML =
+            `<b>Quiz Completed!</b><br>Your Score: ${score} / 30`;
+        clearInterval(timer);
+        return;
+    }
+
+    answered = false;
+    startTimer();
+
+    let q = questions[index];
+    let html = `<p><b>Question ${index + 1} of 30</b></p>`;
+    html += `<p>${q.q}</p>`;
+
+    q.o.forEach((opt, i) => {
+        html += `<label class="option">
+                 <input type="radio" name="ans" onclick="checkAnswer(${i})">
+                 ${opt}</label>`;
+    });
+
+    document.getElementById("quiz").innerHTML = html;
+}
+
+function checkAnswer(choice) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timer);
+
+    let options = document.querySelectorAll(".option");
+    options.forEach((opt, i) => {
+        if (i === questions[index].a) opt.classList.add("correct");
+        if (i === choice && i !== questions[index].a) opt.classList.add("incorrect");
+    });
+
+    if (choice === questions[index].a) score++;
+}
+
+function nextQuestion() {
+    index++;
+    showQuestion();
+}
+
+function skipQuestion() {
+    index++;
+    showQuestion();
+}
+
+// Start quiz
+showQuestion();
+</script>
+
+</body>
+</html>
